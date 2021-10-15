@@ -43,8 +43,8 @@ docker run -ti --network container:airvpn kalilinux/kali-rolling
 ```
 
 
-# enviroment vars
-When the container is start the entry point scripts will use the following envrioment variables (passed to docker run with -e) to configure the firewall and vpn.
+# enviroment variables
+When the container is started the entry point scripts will use the following enviroment variables (passed to docker run with -e) to configure the firewall and vpn.
 
 | var               | defualt                                   | description                                                         |
 |-------------------|-------------------------------------------|---------------------------------------------------------------------|
