@@ -46,7 +46,7 @@ docker run -ti --network container:airvpn kalilinux/kali-rolling
 # enviroment variables
 When the container is started the entry point scripts will use the following enviroment variables (passed to docker run with -e) to configure the firewall and vpn.
 
-| var               | defualt                                   | description                                                         |
+| var               | default                                   | description                                                         |
 |-------------------|-------------------------------------------|---------------------------------------------------------------------|
 | LOCAL_IPS         | "192.168.0.0/16 172.16.0.0/12 10.0.0.0/8" | LAN IPs to allow                                                    |
 | EXPOSED_PORTS     |                                           | Ports to expose to the external network ( both -e and -p required)  |
