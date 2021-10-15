@@ -44,7 +44,7 @@ Kali Linux
 docker run -ti --network container:airvpn kalilinux/kali-rolling
 ```
 
-Qbittorent
+Qbittorrent
 ```
 docker run -d \
     --name qbittorrent \
