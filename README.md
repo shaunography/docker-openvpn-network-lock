@@ -38,10 +38,25 @@ docker run -d \
 because containers will be using this containers network interface to access the VPN, any ports that the container you connect require (torrent client for example) need to be specified here.
 
 ## connect to container (--network container:<name>)
+
+Kali Linux
 ```
 docker run -ti --network container:airvpn kalilinux/kali-rolling
 ```
 
+Qbittorent
+```
+docker run -d \
+    --name qbittorrent \
+    --network container:airvpn \
+    -e PUID=$(id -u) \
+    -e PGID=$(id -u) \
+    -e TZ=Europe/London \
+    -e WEBUI_PORT=8888 \
+    -v ~/.qbittorrent:/config \
+    --restart unless-stopped \
+    -v /media:/media lscr.io/linuxserver/qbittorrent \
+```
 
 # enviroment variables
 When the container is started the entry point scripts will use the following enviroment variables (passed to docker run with -e) to configure the firewall and vpn.
