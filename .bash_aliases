@@ -12,7 +12,7 @@ alias dairvpn='docker run -d \
     --cap-add NET_ADMIN \
     --device /dev/net/tun \
     -e LOCAL_IPS="192.168.1.0/24" \
-    -e EXPOSED_PORTS="8888 61618 1234" \
+    -e EXPOSED_PORTS="8888 61618" \
     -e VPN_HOSTNAMES="europe.all.vpn.airdns.org" \
     -e CONFIG="airvpn" \
     -p 8888:8888 \
