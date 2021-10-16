@@ -2,7 +2,6 @@
 Docker based OpenVPN client with UFW based network lock
 
 # usage
-
 ## create new docker bridge network
 ```
 docker network create \
@@ -12,6 +11,8 @@ docker network create \
     -o com.docker.network.bridge.name="vpnBridge" \
     vpn
 ```
+the default binding ip is 172.30.30.1 not 0.0.0.0, this allows the same ports to be used across multiple docker networks without clashes and will not expose the port the the wider LAN.
+
 ## add openvpn client configuration
 add your openvpn.conf file into `./openvpn/<provider>/client.conf` for example `./openvpn/airvpn/client.conf` (conf file must be name client.conf). if you are using username and password authentication create a txt file (userpass.txt) in the same directory (username line 1 password line 2).
 
@@ -20,7 +21,7 @@ add your openvpn.conf file into `./openvpn/<provider>/client.conf` for example `
 docker build -t vpn .
 ```
 
-## run container
+## run vpn container
 ```
 docker run -d \
     --name airvpn \
@@ -28,23 +29,28 @@ docker run -d \
     --cap-add NET_ADMIN \
     --device /dev/net/tun \
     -e LOCAL_IPS="192.168.1.0/24" \
-    -e EXPOSED_PORTS="8888 61618" \
+    -e EXPOSED_PORTS="8888/tcp 61618/tcp 61618/udp 8388/tcp 8388/udp 1080/tcp" \
     -e VPN_HOSTNAMES="europe.all.vpn.airdns.org" \
     -e CONFIG="airvpn" \
     -p 8888:8888 \
+    -p 8388:8388 \
+    -p 8388:8388/udp \
     -p 61618:61618 \
+    -p 61618:61618/udp \
+    -p 1080:1080 \
     vpn
 ```
-because containers will be using this containers network interface to access the VPN, any ports that the container you connect require (torrent client for example) need to be specified here.
+because other containers will be using this containers network interface to access the VPN, any ports that the containers you connect require need to be specified here. In this example the container will connect to AirVPN and expose ports for Qbitorrent (8888 61618) and a Shadowsocks server (8388 1080).
 
-## connect to container (--network container:<name>)
+## connect to container
+If the vpn container is stopped, child containers will lose their network interface and therefore network connectivity.
 
-Kali Linux
+### Kali Linux
 ```
 docker run -ti --network container:airvpn kalilinux/kali-rolling
 ```
 
-Qbittorrent
+### Qbittorrent
 ```
 docker run -d \
     --name qbittorrent \
@@ -55,8 +61,33 @@ docker run -d \
     -e WEBUI_PORT=8888 \
     -v ~/.qbittorrent:/config \
     --restart unless-stopped \
-    -v /media:/media lscr.io/linuxserver/qbittorrent \
+    -v /media:/media \
+    lscr.io/linuxserver/qbittorrent
 ```
+### Shadowsocks server
+```
+docker run -d \
+    --name shadowsocksairvpn \
+    --network container:airvpn \
+    -e PASSWORD=password \
+    shadowsocks/shadowsocks-libev
+```
+### Shadowsocks client
+```
+docker run -d \
+    --name shadowsocksairvpnclient \
+    --network container:airvpn \
+    shadowsocks/shadowsocks-libev \
+    ss-local \
+    -k password \
+    -p 8388 \
+    -s 127.0.0.1 \
+    -b 0.0.0.0 \
+    -l 1080 \
+    -m aes-256-gcm
+```
+Then point your applicaitons at the socks4 proxy located at `172.30.30.1:1080`
+
 
 # enviroment variables
 When the container is started the entry point scripts will use the following enviroment variables (passed to docker run with -e) to configure the firewall and vpn.
