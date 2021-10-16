@@ -6,7 +6,6 @@ Docker based OpenVPN client with UFW based network lock
 ```
 docker network create \
     --subnet=172.30.30.0/24 \
-    -o com.docker.network.bridge.enable_ip_masquerade=true \
     -o com.docker.network.bridge.host_binding_ipv4="172.30.30.1" \
     -o com.docker.network.bridge.name="vpnBridge" \
     vpn
@@ -40,7 +39,20 @@ docker run -d \
     -p 1080:1080 \
     vpn
 ```
-because other containers will be using this containers network interface to access the VPN, any ports that the containers you connect require need to be specified here. In this example the container will connect to AirVPN and expose ports for Qbitorrent (8888 61618) and a Shadowsocks server (8388 1080).
+because other containers will be using this containers network interface to access the VPN, any ports that the containers you connect require, need to be specified here. In this example the container will connect to AirVPN and expose ports for Qbittorrent (8888 61618) and a Shadowsocks server (8388 1080).
+
+## enviroment variables
+When the vpn container is started the entry point scripts will use the following enviroment variables (passed to docker run with -e) to configure the firewall and vpn.
+
+| var               | default                                   | description                                                         |
+|-------------------|-------------------------------------------|---------------------------------------------------------------------|
+| LOCAL_IPS         | "192.168.0.0/16 172.16.0.0/12 10.0.0.0/8" | LAN IPs to allow                                                    |
+| EXPOSED_PORTS     |                                           | Ports to expose to the external network ( both -e and -p required)  |
+| VPN_HOSTNAMES     |                                           | Hostname of vpn server entry point                                  |
+| CONFIG            |                                           | name of the VPN provider, needs to match the folder name in openvpn |
+| AUTH              |                                           | specfiy "userpass" if username and password auth is being used      |
+| VPN_INTERFACES    | "tun+"                                    | name of tunnel interfaces                                           |
+
 
 ## connect to container
 If the vpn container is stopped, child containers will lose their network interface and therefore network connectivity.
@@ -73,6 +85,7 @@ docker run -d \
     shadowsocks/shadowsocks-libev
 ```
 ### Shadowsocks client
+#### docker
 ```
 docker run -d \
     --name shadowsocksairvpnclient \
@@ -86,18 +99,9 @@ docker run -d \
     -l 1080 \
     -m aes-256-gcm
 ```
-Then point your applicaitons at the socks4 proxy located at `172.30.30.1:1080`
-
-
-# enviroment variables
-When the container is started the entry point scripts will use the following enviroment variables (passed to docker run with -e) to configure the firewall and vpn.
-
-| var               | default                                   | description                                                         |
-|-------------------|-------------------------------------------|---------------------------------------------------------------------|
-| LOCAL_IPS         | "192.168.0.0/16 172.16.0.0/12 10.0.0.0/8" | LAN IPs to allow                                                    |
-| EXPOSED_PORTS     |                                           | Ports to expose to the external network ( both -e and -p required)  |
-| VPN_HOSTNAMES     |                                           | Hostname of vpn server entry point                                  |
-| CONFIG            |                                           | name of the VPN provider, needs to match the folder name in openvpn |
-| AUTH              |                                           | specfiy "userpass" if username and password auth is being used      |
-| VPN_INTERFACES    | "tun+"                                    | name of tunnel interfaces                                           |
-
+Then point your applications at the socks5 proxy located at `172.30.30.1:1080`
+#### locally
+```
+ss-local -k password -p 8388 -s 172.30.30.1 -l 1080 -m aes-256-gcm
+```
+Then point your applications at the socks5 proxy located at `127.0.0.1:1080`

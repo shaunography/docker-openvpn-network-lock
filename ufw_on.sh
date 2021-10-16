@@ -6,7 +6,7 @@
 # OpenVPN interfaces where the traffic is fully allowed.
 : ${VPN_INTERFACES:="tun+"}
 
-# AirVPN VPN Ips
+# VPN Provider Server Hostnames
 : ${VPN_HOSTNAMES:=""}
 
 # Exposed Ports
@@ -18,7 +18,7 @@ ufw enable
 
 
 # LAN
-# If DNS is provided by your home router (i.e. 192,168.1.254) then DNS is allowed also
+# If DNS is provided by your home router (i.e. 192.168.1.254) then DNS is allowed also
 for ip in $LOCAL_IPS; do
     echo "Allowing LAN Traffic to - $ip"
     ufw allow out to $ip
