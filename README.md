@@ -15,6 +15,13 @@ the default binding ip is 172.30.30.1 not 0.0.0.0, this allows the same ports to
 ## add openvpn client configuration
 add your openvpn.conf file into `./openvpn/<provider>/client.conf` for example `./openvpn/airvpn/client.conf` (conf file must be name client.conf). if you are using username and password authentication create a txt file (userpass.txt) in the same directory (username line 1 password line 2).
 
+It is also recoemened to add the following to your .ovpn file to allow openresolv to configure dns
+```
+script-security 2 
+up /etc/openvpn/update-resolv-conf 
+down /etc/openvpn/update-resolv-conf
+```
+
 ## build image
 ```
 docker build -t vpn .
