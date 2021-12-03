@@ -7,6 +7,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
         openvpn \
         shadowsocks-libev \
 	openresolv \
+	jq \
  && apt-get autoremove -y \
  && apt-get clean -y \
  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
