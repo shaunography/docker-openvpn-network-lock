@@ -53,12 +53,15 @@ When the vpn container is started the entry point scripts will use the following
 
 | var               | default                                   | description                                                         |
 |-------------------|-------------------------------------------|---------------------------------------------------------------------|
+| TYPE              | openvpn                                   | Set the type to "openconnect" to use openconnect client             |
 | LOCAL_IPS         | "192.168.0.0/16 172.16.0.0/12 10.0.0.0/8" | LAN IPs to allow                                                    |
 | EXPOSED_PORTS     |                                           | Ports to expose to the external network ( both -e and -p required)  |
 | VPN_HOSTNAMES     |                                           | Hostname of vpn server entry point                                  |
 | CONFIG            |                                           | name of the VPN provider, needs to match the folder name in openvpn |
 | AUTH              |                                           | specfiy "userpass" if username and password auth is being used      |
 | VPN_INTERFACES    | "tun+"                                    | name of tunnel interfaces                                           |
+| PROTOCOL          |                                           | protocol to use with openconnect client. e.g. "nc"                  |
+| USERNAME          |                                           | username to pass to openconnect client                              |
 
 
 ## connect to container
