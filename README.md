@@ -1,5 +1,5 @@
 # docker-openvpn-network-lock
-Docker based OpenVPN client with UFW based network lock
+Docker based OpenVPN client with UFW based network lock (now also supports openconnect)
 
 # usage
 ## create new docker bridge network
@@ -112,3 +112,22 @@ Then point your applications at the socks5 proxy located at `172.30.30.1:1080`
 ss-local -k password -p 8388 -s 172.30.30.1 -l 1080 -m aes-256-gcm
 ```
 Then point your applications at the socks5 proxy located at `127.0.0.1:1080`
+
+## Openconnect
+To use the openconnect client instead of OpenVPN, just set the TYPE, PROTOCOL and USERNAME environment variables on your docker run command
+```
+docker run -ti \
+    --name openconnectvpn \
+    --network vpn \
+    --cap-add NET_ADMIN \
+    --device /dev/net/tun \
+    -e TYPE=openconnect \
+    -e PROTOCOL=nc \
+    -e VPN_HOSTNAMES=vpn.uk.test.net \
+    -e USERNAME=tyler.durden \
+    -e LOCAL_IPS="192.168.1.0/24" \
+    -e EXPOSED_PORTS="8388/tcp 1080/tcp" \
+    -p 8388:8388 \
+    -p 1080:1080 \
+    vpn
+```
